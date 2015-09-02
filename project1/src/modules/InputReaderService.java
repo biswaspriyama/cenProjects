@@ -1,9 +1,10 @@
 package modules;
+
+
 import enums.Configurations;
 
 import java.io.FileInputStream;
 
-import java.io.IOException;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
@@ -12,7 +13,9 @@ import java.util.*;
 /**
  * Created by yugarsi on 8/27/15.
  */
-public class ReadInputFiles {
+public class InputReaderService {
+
+    public static int actualDataSize = 0;
 
     //function to read on 32 bits little endian floating number from data
 
@@ -28,26 +31,32 @@ public class ReadInputFiles {
 
     //function to read entire binary file and returning it as an arrayList of Floats
 
-    private static ArrayList<Float> parseBinary(String fileName) throws IOException {
+    public static float[] parseBinary(String fileName) throws IOException {
         FileInputStream fObj = new FileInputStream(fileName);
         DataInputStream inputFile = new DataInputStream(fObj);
-        ArrayList<Float> outArray = new ArrayList<Float>();
+        ArrayList<Float> outArrayList = new ArrayList<Float>();
         boolean eof = false;
-        int i = 0;
+        int count = 0;
         try {
             while (!eof){
                 float number = read32bits(inputFile);
-                if(number != 168) {
-                    outArray.add(number);
-                    //System.out.print(number + "\n");
-                    i++;
+                if(number != 168.0 && number != 157.0 ) {
+                    outArrayList.add(number);
+                    count++;
                 }
             }
         } catch (IOException e) {
             eof = true;
         }
-        System.out.print(i + "\n");
+
+        actualDataSize = count;
         inputFile.close();
+        float[] outArray = new float[count];
+        count=0;
+        for (Float f : outArrayList) {
+            Float data = new Float(f.floatValue());
+            outArray[count++] = (data != null ? data : Float.NaN); // Or whatever default you want.
+        }
         return outArray;
 
 
@@ -80,10 +89,10 @@ public class ReadInputFiles {
         String[] fileNames = getAllFileNames();
         int dynamicSize = 0;
         for (String fileName : fileNames) {
-            ArrayList<Float> dataList = parseBinary(fileName);
-            dynamicSize = dataList.size();
-            for (int i = 0; i < dataList.size(); i++)
-                sum[i] = sum[i] + dataList.get(i);
+            float[] dataList = parseBinary(fileName);
+            dynamicSize = dataList.length;
+            for (int i = 0; i < dataList.length; i++)
+                sum[i] = sum[i] + dataList.length;
         }
 
         FileOutputStream fp = new FileOutputStream(Configurations.meanOutFile);
@@ -97,26 +106,29 @@ public class ReadInputFiles {
 
     //Function that reads from the saved mean binary file for faster access
 
-    public ArrayList<Float> readMeanFile (String fileName) throws FileNotFoundException {
+    public float[] readMeanFile (String fileName) throws FileNotFoundException {
         FileInputStream fObj = new FileInputStream(fileName);
         DataInputStream iObj = new DataInputStream(fObj);
         ArrayList<Float> meanValues = new ArrayList<Float>();
 
         boolean eof = false;
-        int i = 0;
         try {
             while (!eof){
                 float number = iObj.readFloat();
                 meanValues.add(number);
-                i++;
             }
         } catch (IOException e) {
             eof = true;
         }
-
-//        for(i=0;i<meanValues.size();i++)
-//            System.out.print(meanValues.get(i)+"\n");
-        return meanValues;
+        float[] meanValuesArr = new float[meanValues.size()];
+        int count=0;
+        for (Float f : meanValues) {
+            Float data = new Float(f.floatValue());
+            meanValuesArr[count++] = (data != null ? data : Float.NaN); // Or whatever default you want.
+        }
+//	        for(i=0;i<meanValues.size();i++)
+//	            System.out.print(meanValues.get(i)+"\n");
+        return meanValuesArr;
     }
 
 }

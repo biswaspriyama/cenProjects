@@ -1,20 +1,21 @@
 import enums.Configurations;
-import modules.ReadInputFiles;
-
+import modules.*;
 import java.io.IOException;
+import java.sql.Timestamp;
 
 public class Main {
 
     public static void main(String[] args) {
+        java.util.Date date = new java.util.Date();
+        System.out.println(new Timestamp(date.getTime()));
 
-        ReadInputFiles r1 = new ReadInputFiles();
-        try {
-            r1.computeGlobalMean();
-            r1.readMeanFile(Configurations.meanOutFile);
+        CorrelationCalculator crObj = new CorrelationCalculator();
+        crObj.createCorrelationMatrix();
 
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        date = new java.util.Date();
+        System.out.println(new Timestamp(date.getTime()));
+
+
 
     }
 }
