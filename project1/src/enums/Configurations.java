@@ -5,15 +5,19 @@ package enums;
  */
 public interface Configurations {
 
-    String Files = "/Users/yugarsi/git-local/cenProjects/smallData/";
-    int startYear = 1990;
+    String Files = "/Users/yugarsi/git-local/cenProjects/LargeData/";
+    String meanOutFile = "/Users/yugarsi/git-local/cenProjects/LargeData/mean.bin";
+    String sampleFile = "1990/diffw01y1990+landmask";
+    int startYear = 1979;
     int endYear = 2005;
     int numWeeks = 52;
-    int areaDimension = 3969;
+    int areaDimension = 136192;
+    int actualDatasize = 66129;
     int timeSeries = (endYear-startYear+1)*numWeeks;
     double minCorrelationCoeff=0.9;
     double maxCorrelationCoeff=0.95;
-    int threadLimit=832;
-    String meanOutFile = "/Users/yugarsi/git-local/cenProjects/smallData/mean.bin";
+    int threadLimit=400;
+    int cThreadLimit = 1000;
+
 
 }

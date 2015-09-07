@@ -37,19 +37,23 @@ public class InputReaderService {
         ArrayList<Float> outArrayList = new ArrayList<Float>();
         boolean eof = false;
         int count = 0;
+
         try {
             while (!eof){
                 float number = read32bits(inputFile);
-                if(number != 168.0 && number != 157.0 ) {
+                if(number != 168.0 && number != 157.0) {
+                    //System.out.print(number+",");
                     outArrayList.add(number);
                     count++;
                 }
+
             }
         } catch (IOException e) {
             eof = true;
         }
 
         actualDataSize = count;
+        //System.out.print("\n"+count+",");
         inputFile.close();
         float[] outArray = new float[count];
         count=0;
@@ -71,7 +75,7 @@ public class InputReaderService {
         DecimalFormat formatter = new DecimalFormat("00");
         for (int x = Configurations.startYear; x <= Configurations.endYear; x++) {
             for (int week = 1; week <= Configurations.numWeeks; week++) {
-                fileNames[fileNo] = Configurations.Files + Integer.toString(x) + "/Beaufort_Sea_diffw" + formatter.format(week) + "y" + Integer.toString(x) + "+landmask";
+                fileNames[fileNo] = Configurations.Files + Integer.toString(x) + "/diffw" + formatter.format(week) + "y" + Integer.toString(x) + "+landmask";
                 fileNo++;
             }
         }
@@ -92,7 +96,7 @@ public class InputReaderService {
             float[] dataList = parseBinary(fileName);
             dynamicSize = dataList.length;
             for (int i = 0; i < dataList.length; i++)
-                sum[i] = sum[i] + dataList.length;
+                sum[i] = sum[i] + dataList[i];
         }
 
         FileOutputStream fp = new FileOutputStream(Configurations.meanOutFile);

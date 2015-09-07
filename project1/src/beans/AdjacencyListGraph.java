@@ -9,10 +9,11 @@ public class AdjacencyListGraph {
 
     List<Integer>[] adj;
     int size;
+    int i;
     public AdjacencyListGraph(int n) {
         size = n;
         adj = (List<Integer>[])new List[size];
-        for (int i = 0; i < size ; i++)
+        for (i = 0; i < size ; i++)
             adj[i] = new ArrayList<Integer>();
     }
     public void setEdge(int i, int j) {

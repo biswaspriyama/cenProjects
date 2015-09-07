@@ -1,7 +1,8 @@
 package modules;
 import enums.Configurations;
 
-import java.util.ArrayList;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Created by yugarsi on 8/31/15.
@@ -34,8 +35,9 @@ public class ParallelFileReader implements Runnable {
         InputReaderService readerObj = new InputReaderService();
         String[] fileNames = readerObj.getAllFileNames();
         int count = 0;
+        int i;
         ArrayList<Thread> threadList = new ArrayList<>();
-        for (int i=0;i<fileNames.length;i++) {
+        for ( i=0;i<fileNames.length;i++) {
             ParallelFileReader pRead = new ParallelFileReader(fileNames[i]);
             threadList.add(new Thread(pRead));
             count++;
