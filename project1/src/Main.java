@@ -1,4 +1,5 @@
-import enums.Configurations;
+import enums.*;
+import beans.*;
 import modules.*;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -23,8 +24,12 @@ public class Main {
         //To calculate correlation
 
         CorrelationCalculator crObj = new CorrelationCalculator();
-        //crObj.createCorrelationMatrix();
         crObj.createCorrelationMatrixNew();
+
+
+//        MysqlConnector sqlObj= new MysqlConnector();
+//        sqlObj.createDatabase(MySqlConfig.DbName);
+//        sqlObj.closeDbConnection();
 
 
         date = new java.util.Date();

@@ -65,11 +65,11 @@ public class ParallelFileReaderNew implements Runnable{
             }
         }
 
-        for(int i=0;i<50000;i++)
-            System.out.print(completeData.get(i)[0] + ",");
-        System.out.print("\n");
-        for(int i=0;i<50000;i++)
-            System.out.print(completeData.get(i)[1] + ",");
+//        for(int i=0;i<50000;i++)
+//            System.out.print(completeData.get(i)[0] + ",");
+//        System.out.print("\n");
+//        for(int i=0;i<50000;i++)
+//            System.out.print(completeData.get(i)[1] + ",");
 
 
         java.util.Date date = new java.util.Date();

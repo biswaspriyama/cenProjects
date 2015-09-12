@@ -75,7 +75,7 @@ public class InputReaderService {
         DecimalFormat formatter = new DecimalFormat("00");
         for (int x = Configurations.startYear; x <= Configurations.endYear; x++) {
             for (int week = 1; week <= Configurations.numWeeks; week++) {
-                fileNames[fileNo] = Configurations.Files + Integer.toString(x) + "/diffw" + formatter.format(week) + "y" + Integer.toString(x) + "+landmask";
+                fileNames[fileNo] = Configurations.Files + Integer.toString(x) + "/"+Configurations.fileNamePattern + formatter.format(week) + "y" + Integer.toString(x) + "+landmask";
                 fileNo++;
             }
         }

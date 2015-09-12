@@ -6,4 +6,6 @@ public interface MySqlConfig {
     String dbUrl = "jdbc:mysql://localhost";
     String user = "root";
     String password = "";
+    String DbName = "cenProject";
+    String tableName ="iceLargeData1";
 }

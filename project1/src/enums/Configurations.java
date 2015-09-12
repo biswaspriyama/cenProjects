@@ -5,14 +5,14 @@ package enums;
  */
 public interface Configurations {
 
-    String Files = "/Users/yugarsi/git-local/cenProjects/LargeData/";
-    String meanOutFile = "/Users/yugarsi/git-local/cenProjects/LargeData/mean.bin";
-    String sampleFile = "1990/diffw01y1990+landmask";
-    int startYear = 1979;
+    String Files = "/Users/yugarsi/git-local/cenProjects/smallData/";
+    String meanOutFile = "/Users/yugarsi/git-local/cenProjects/smallData/mean.bin";
+    String fileNamePattern = "Beaufort_Sea_diffw";
+    int startYear = 1990;
     int endYear = 2005;
     int numWeeks = 52;
-    int areaDimension = 136192;
-    int actualDatasize = 66129;
+    int areaDimension = 3969;
+    int actualDatasize = 3186;
     int timeSeries = (endYear-startYear+1)*numWeeks;
     double minCorrelationCoeff=0.9;
     double maxCorrelationCoeff=0.95;
