@@ -1,7 +1,14 @@
 package beans;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.sql.*;
+import java.util.Arrays;
+import java.util.List;
+
+import enums.Configurations;
 import enums.MySqlConfig;
+import beans.AdjacencyListGraph;
 
 /**
  * Created by yugarsi on 9/7/15.
@@ -35,13 +42,13 @@ public class MysqlConnector {
                 e.printStackTrace();
             }
         }
-    public void createTable(String TableName){
+    public void createTable(String tableName){
         try{
             System.out.println("Creating MY SQL DB...");
             stmt = conn.createStatement();
-            String sql = "CREATE TABLE REGISTRATION " +
+            String sql = "CREATE TABLE  "+tableName +
                     "(id INTEGER not NULL, " +
-                    " nodes VARCHAR(255), " +
+                    " Nodes LONGTEXT, " +
                     " PRIMARY KEY ( id ))";
 
             stmt.executeUpdate(sql);
@@ -52,7 +59,77 @@ public class MysqlConnector {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+    }
 
+    public void insertValues(String tableName, int vertexNum, String edges){
+        String query = "INSERT INTO "+tableName+" (id, Nodes) VALUES (?,?)";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setInt(1, vertexNum);
+            pstmt.setString(2,edges);
+            pstmt.execute();
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public AdjacencyListGraph readStringRows(String tableName){
+
+        AdjacencyListGraph graph = new AdjacencyListGraph(Configurations.actualDatasize);
+        try {
+            Statement st = conn.createStatement();
+            st.executeQuery("SELECT Nodes FROM "+tableName);//+"WHERE id="+Integer.toString(id));
+            ResultSet rs = st.getResultSet();
+            int count = 0;
+            int i;
+            while (rs.next()) {
+                String nodes = rs.getString("Nodes");
+
+                if (nodes != ""){
+                    nodes = nodes.substring(1); //removing first comma
+                    System.out.print(nodes+"\n");
+                    List<String> edgeList = Arrays.asList(nodes.split(","));
+                    for(i=0;i<edgeList.size();i++)
+                        graph.setEdge(count,Integer.parseInt(edgeList.get(i)));
+                    count ++;
+
+                }
+            }
+            rs.close();
+            st.close();
+            System.out.println(count + " rows were retrieved");
+        }catch (SQLException se){
+            throw new RuntimeException(se);
+        }
+        return graph;
+    }
+
+    public double[] edgeCount(String tableName){
+
+        double[] degree = new double[24076];
+        try {
+            Statement st = conn.createStatement();
+            st.executeQuery("SELECT Nodes FROM "+tableName);//+"WHERE id="+Integer.toString(id));
+            ResultSet rs = st.getResultSet();
+            int count = 0;
+            while (rs.next()) {
+                String nodes = rs.getString("Nodes");
+
+                if (nodes != ""){
+                    nodes = nodes.substring(1); //removing first comma
+                    List<String> edgeList = Arrays.asList(nodes.split(","));
+                    System.out.print(edgeList.size()+"\n");
+                    degree[count] = edgeList.size();
+                    count++;
+                }
+            }
+            rs.close();
+            st.close();
+        }catch (SQLException se){
+            throw new RuntimeException(se);
+        }
+        return degree;
     }
 
     public void closeDbConnection() {

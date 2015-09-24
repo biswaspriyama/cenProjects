@@ -98,12 +98,14 @@ public class InputReaderService {
             for (int i = 0; i < dataList.length; i++)
                 sum[i] = sum[i] + dataList[i];
         }
-
+        System.out.print("\n"+dynamicSize+"\n");
         FileOutputStream fp = new FileOutputStream(Configurations.meanOutFile);
         DataOutputStream dp = new DataOutputStream(fp);
-
+        float mean;
         for (int i = 0;i< dynamicSize ; i++) {
-            dp.writeFloat(sum[i] / Configurations.timeSeries);
+            mean = sum[i] / Configurations.timeSeries;
+            //System.out.print(mean+"\n");
+            dp.writeFloat(mean);
         }
     }
 
@@ -124,14 +126,20 @@ public class InputReaderService {
         } catch (IOException e) {
             eof = true;
         }
-        float[] meanValuesArr = new float[meanValues.size()];
+        float[] meanValuesArr = new float[meanValues.size()];  //Converting into float array from list
         int count=0;
         for (Float f : meanValues) {
             Float data = new Float(f.floatValue());
-            meanValuesArr[count++] = (data != null ? data : Float.NaN); // Or whatever default you want.
+            meanValuesArr[count++] = (data != null ? data : Float.NaN);
         }
-//	        for(i=0;i<meanValues.size();i++)
-//	            System.out.print(meanValues.get(i)+"\n");
+
+        try {
+            iObj.close();
+            fObj.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return meanValuesArr;
     }
 
