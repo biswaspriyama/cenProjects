@@ -66,7 +66,7 @@ public class MysqlConnector {
         try {
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setInt(1, vertexNum);
-            pstmt.setString(2,edges);
+            pstmt.setString(2, edges);
             pstmt.execute();
         }catch (SQLException e) {
             throw new RuntimeException(e);
@@ -88,13 +88,11 @@ public class MysqlConnector {
 
                 if (nodes != ""){
                     nodes = nodes.substring(1); //removing first comma
-                    System.out.print(nodes+"\n");
                     List<String> edgeList = Arrays.asList(nodes.split(","));
                     for(i=0;i<edgeList.size();i++)
                         graph.setEdge(count,Integer.parseInt(edgeList.get(i)));
-                    count ++;
-
                 }
+                count ++;
             }
             rs.close();
             st.close();
@@ -105,9 +103,9 @@ public class MysqlConnector {
         return graph;
     }
 
-    public double[] edgeCount(String tableName){
+    public float[] edgeCount(String tableName){
 
-        double[] degree = new double[24076];
+        float[] degree = new float[Configurations.actualDatasize];
         try {
             Statement st = conn.createStatement();
             st.executeQuery("SELECT Nodes FROM "+tableName);//+"WHERE id="+Integer.toString(id));
@@ -122,6 +120,12 @@ public class MysqlConnector {
                     System.out.print(edgeList.size()+"\n");
                     degree[count] = edgeList.size();
                     count++;
+                }
+                else {
+                    degree[count] = 0;
+                    System.out.print(0+"\n");
+                    count++;
+
                 }
             }
             rs.close();

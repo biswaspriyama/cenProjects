@@ -1,70 +1,57 @@
 package modules;
 
-/**
- * Created by yugarsi on 9/23/15.
- */
-
-import java.util.logging.Logger;
-
-
-import static com.googlecode.charts4j.Color.*;
-import static com.googlecode.charts4j.UrlUtil.normalize;
-import static org.junit.Assert.assertEquals;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import beans.MysqlConnector;
-import com.googlecode.charts4j.*;
-import enums.Configurations;
 import enums.MySqlConfig;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
-public class PlotGraphs {
+import javax.swing.*;
+import java.awt.*;
 
-//    @BeforeClass
-//    public static void setUpBeforeClass() throws Exception {
-//        Logger.global.setLevel(Level.ALL);
-//    }
+/**
+ * Created by yugarsi on 9/25/15.
+ */
+public class PlotGraphs extends JFrame {
+    String chartTitle = "";
+    String xAxisLabel = "";
+    String yAxisLabel = "";
 
-    @Test
-    //Defining a very simple chart.
-    public void example1() {
-        // EXAMPLE CODE START
-        //Plot plot = Plots.newPlot(Data.newData(50,50,50,50,50,50,50,50,50));
-        double a[] ={1,2,3,4,5};
-        Plot plot = Plots.newPlot(Data.newData(a));
-        LineChart chart = GCharts.newLineChart(plot);
-        String url = chart.toURLString();
-        // EXAMPLE CODE END. Use this url string in your web or
-        // Internet application.
-        System.out.print(url);
-//        String expectedString = "http://chart.apis.google.com/chart?chd=e:AAqnVU..&chs=200x125&cht=lc";
-//        assertEquals("Junit error", normalize(expectedString), normalize(url));
-    }
-    public void plotHistogram(double[] array) {
-
-        Plot plot = Plots.newPlot(Data.newData(array));
-        LineChart chart = GCharts.newLineChart(plot);
-        chart.setSize(400, 400);
-        //chart.addHorizontalRangeMarker(33.3, 66.6, LIGHTBLUE);
-        //chart.setGrid(33.3, 33.3, 3, 3);
-        //chart.addXAxisLabels(AxisLabelsFactory.newAxisLabels("Satellite Locations", 50.0));
-        //chart.addYAxisLabels(AxisLabelsFactory.newNumericAxisLabels(0, 20,200));
-        //chart.addYAxisLabels(AxisLabelsFactory.newAxisLabels("Degree", 50.0));
-        String url = chart.toURLString();
-        // EXAMPLE CODE END. Use this url string in your web or
-        // Internet application.
-        System.out.print(url);
+    public PlotGraphs(float[] data, String chartTitle, String xAxisLabel, String yAxisLabel) {
+        super("CEN Project Graph");
+        this.chartTitle =chartTitle;
+        this.xAxisLabel = xAxisLabel;
+        this.yAxisLabel =yAxisLabel;
+        JPanel chartPanel = createChartPanel(data);
+        add(chartPanel, BorderLayout.CENTER);
+        setSize(900, 900);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
     }
 
-    public void plotDegreeDistribution(){
-        MysqlConnector sqlObj= new MysqlConnector();
-        //sqlObj.readStringRows(MySqlConfig.tableName);
-        double[] edgeCount = sqlObj.edgeCount(MySqlConfig.tableName);
-        plotHistogram(edgeCount);
+    private JPanel createChartPanel(float[] data) {
+        String chartTitle = "Degree Distribution Graph";
+        String xAxisLabel = "Area Location";
+        String yAxisLabel = "Degree";
+
+        XYDataset dataset = createDataset(data);
+        JFreeChart chart = ChartFactory.createXYLineChart(this.chartTitle,
+                this.xAxisLabel, this.yAxisLabel, dataset);
+        return new ChartPanel(chart);
     }
 
+    private XYDataset createDataset(float[] data) {
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        XYSeries series1 = new XYSeries("Object 1");
+
+        for(int i=0;i<data.length;i++){
+            series1.add((float)i, data[i]);
+        }
+        dataset.addSeries(series1);
+        return dataset;
+    }
 
 }
