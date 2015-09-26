@@ -1,5 +1,5 @@
 package beans;
-
+import java.math.*;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.sql.*;
@@ -91,8 +91,8 @@ public class MysqlConnector {
                     List<String> edgeList = Arrays.asList(nodes.split(","));
                     for(i=0;i<edgeList.size();i++)
                         graph.setEdge(count,Integer.parseInt(edgeList.get(i)));
+                    count ++;
                 }
-                count ++;
             }
             rs.close();
             st.close();
@@ -117,13 +117,12 @@ public class MysqlConnector {
                 if (nodes != ""){
                     nodes = nodes.substring(1); //removing first comma
                     List<String> edgeList = Arrays.asList(nodes.split(","));
-                    System.out.print(edgeList.size()+"\n");
+                    //System.out.print(edgeList.size()+"\n");
                     degree[count] = edgeList.size();
                     count++;
                 }
                 else {
                     degree[count] = 0;
-                    System.out.print(0+"\n");
                     count++;
 
                 }

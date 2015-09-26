@@ -62,9 +62,31 @@ public class InputReaderService {
             outArray[count++] = (data != null ? data : Float.NaN); // Or whatever default you want.
         }
         return outArray;
-
-
     }
+
+
+    public static Queue<Integer> getLandIndexes(String fileName) throws IOException {
+        FileInputStream fObj = new FileInputStream(fileName);
+        DataInputStream inputFile = new DataInputStream(fObj);
+        Queue<Integer> indexQueue = new LinkedList<Integer>();
+        boolean eof = false;
+        int count = 0;
+
+        try {
+            while (!eof){
+                float number = read32bits(inputFile);
+                if(number == 168.0 || number == 157.0) {
+                    indexQueue.add(count);
+                }
+                count++;
+            }
+        } catch (IOException e) {
+            eof = true;
+        }
+        inputFile.close();
+        return indexQueue;
+    }
+
 
     //function to get all file names
 

@@ -8,8 +8,9 @@ public interface Configurations {
     String Files = "/Users/yugarsi/git-local/cenProjects/largeData/";
     String meanOutFile = "/Users/yugarsi/git-local/cenProjects/largeData/mean.bin";
     String fileNamePattern = "diffw";
+    String sampleFileName = Files+"1979/diffw01y1979+landmask";
     int startYear = 1979;
-    int endYear = 2005;
+    int endYear = 1987;
     int numWeeks = 52;
     int areaDimension = 136192;
     int actualDatasize = 66129;

@@ -18,11 +18,10 @@ public class CorrelationCalculator {
 
     //THESE FUNCTIONS ARE FOR NEW LIBRARY
 
-    public void createCorrelationMatrix() {
+    public void computeCorrelation(double threshold) {
 
         ParallelFileReader pRead = new ParallelFileReader();
         ArrayList<float[]> completeData = pRead.LoadEntireData();
-        ListIterator listIterator = completeData.listIterator();
         int dataSize = Configurations.actualDatasize;
         System.out.print(dataSize);
 
@@ -38,6 +37,7 @@ public class CorrelationCalculator {
 
         AdjacencyListGraph graph = new AdjacencyListGraph(dataSize);
         System.out.print("I am Starting\n");
+
         MysqlConnector sqlObj= new MysqlConnector();
 
         int edgeCount = 0;
@@ -48,7 +48,7 @@ public class CorrelationCalculator {
             String allEdges = "";
             for (y = x + 1; y < Configurations.actualDatasize; y++) {
                 correlationCoeff = computeCoefficients(x, y, AllMeans[x], AllMeans[y], completeData);
-                if (correlationCoeff >= Configurations.maxCorrelationCoeff) {
+                if (correlationCoeff >= threshold) {
                     allEdges=allEdges+","+Integer.toString(y);
                     if (!Configurations.writeToDb){
                         graph.setEdge(x,y);
