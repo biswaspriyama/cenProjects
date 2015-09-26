@@ -78,7 +78,8 @@ public class AdjacencyListGraph {
 
     }
 
-    public void getGRandom(AdjacencyListGraph G){
+    public double[] getGRandom(AdjacencyListGraph G){
+        double[] gRandom = new double[2];
         float totalVertices = Configurations.actualDatasize;
         float[] vertexDegree = G.getAlldegrees(G);
         float vertexSum = 0;
@@ -87,14 +88,18 @@ public class AdjacencyListGraph {
         }
         double meanVertexDegree = vertexSum/totalVertices;
         double gammaRandom = meanVertexDegree/totalVertices;
+        gRandom[0] = gammaRandom;
         double LengthRandom = Math.log(totalVertices)/Math.log(meanVertexDegree);
+        gRandom[1] = LengthRandom;
+
+        return gRandom;
 
     }
 
-    public int getClusteringCoefficientSingleNode(AdjacencyListGraph G, int node){
+    public float getClusteringCoefficientSingleNode(AdjacencyListGraph G, int node){
 
-        int clusterEdgeCount = G.adj[node].size();
-        int vertexCount = clusterEdgeCount;
+        float clusterEdgeCount = G.adj[node].size();
+        float vertexCount = clusterEdgeCount;
 
         for(int i=0;i< G.adj[node].size();i++)
         {
@@ -106,14 +111,22 @@ public class AdjacencyListGraph {
                     clusterEdgeCount++;
             }
         }
-        int coefficient = 2*clusterEdgeCount/(vertexCount*(vertexCount-1));
-        return coefficient;
+
+        System.out.print(vertexCount+":"+clusterEdgeCount);
+//        float coefficient = 0;
+//        try {
+//                coefficient = 2 * clusterEdgeCount / (vertexCount * (vertexCount - 1));
+//        }catch (ArithmeticException e)
+//        {
+//            return 0;
+//        }
+        return 0;
     }
 
     public float getClusteringCoefficientAllNodes(AdjacencyListGraph G){
         int size = Configurations.actualDatasize;
         float clusteringCoeff=0;
-        int singleCluster=0;
+        float singleCluster=0;
 
         for(int i=0;i< adj.length;i++)
         {

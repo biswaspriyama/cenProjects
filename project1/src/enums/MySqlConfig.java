@@ -7,5 +7,5 @@ public interface MySqlConfig {
     String user = "graphUser";
     String password = "1234";
     String DbName = "cenProject";
-    String tableName ="1weeklagMin";
+    String tableName ="4weeklag";
 }

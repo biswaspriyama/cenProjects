@@ -18,10 +18,10 @@ public class CorrelationCalculator {
 
     //THESE FUNCTIONS ARE FOR NEW LIBRARY
 
-    public void computeCorrelation(double threshold) {
+    public void computeCorrelation(double threshold, int lag) {
 
-        int num = readObj.totalFileNumber(Configurations.weekLag);
-        ParallelFileReader pRead = new ParallelFileReader(num);
+
+        ParallelFileReader pRead = new ParallelFileReader();
         ArrayList<float[]> completeData = pRead.LoadEntireData();
         int dataSize = Configurations.actualDatasize;
         System.out.print(dataSize);
@@ -47,8 +47,8 @@ public class CorrelationCalculator {
         int y;
         for (x = 0; x < dataSize; x++) {
             String allEdges = "";
-            for (y = x + 1; y < Configurations.actualDatasize; y++) {
-                correlationCoeff = computeCoefficients(x, y, AllMeans[x], AllMeans[y], completeData);
+            for (y = x+1; y < Configurations.actualDatasize; y++) {
+                correlationCoeff = computeCoefficients(x, y, AllMeans[x], AllMeans[y], completeData,lag);
                 if (correlationCoeff >= threshold) {
                     allEdges=allEdges+","+Integer.toString(y);
                     if (!Configurations.writeToDb){
@@ -67,7 +67,10 @@ public class CorrelationCalculator {
     }
 
 
-    float computeCoefficients(int x, int y, float meanX, float meanY, ArrayList<float[]> completeData) {
+
+
+
+    float computeCoefficients(int x, int y, float meanX, float meanY, ArrayList<float[]> completeData, int lag) {
         float Sx = 0;
         float Sy = 0;
         float Sxy = 0;
@@ -77,13 +80,21 @@ public class CorrelationCalculator {
 
         float[] xData = completeData.get(x);
         float[] yData = completeData.get(y);
-        for (int i = 0; i < xData.length; i++) {
+        for (int i = 0; i < xData.length; i=i+1) {
             float term1 = (xData[i] - meanX);
             Sx = Sx + term1*term1;
             float term2 = (yData[i] - meanY);
             Sy = Sy + term2*term2;
-            Sxy = Sxy + term1 * term2;
+            if(lag==0)
+                Sxy = Sxy + term1 * term2;
+            else{
+                int index = i+lag;
+                if (index < yData.length)
+                    term2 = (yData[i+lag] - meanY);
+                Sxy = Sxy + term1 * term2;
+            }
         }
+
         //System.out.print(Sxy+","+Sx+','+Sy + "\n");
         if (Sx == 0 || Sy == 0)
             return 0;

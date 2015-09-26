@@ -90,7 +90,7 @@ public class MysqlConnector {
                     nodes = nodes.substring(1); //removing first comma
                     List<String> edgeList = Arrays.asList(nodes.split(","));
                     for(i=0;i<edgeList.size();i++)
-                        graph.setEdge(count,Integer.parseInt(edgeList.get(i)));
+                        graph.setEdgeModified(count,Integer.parseInt(edgeList.get(i)));
                     count ++;
                 }
             }

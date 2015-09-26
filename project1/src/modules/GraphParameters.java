@@ -1,6 +1,8 @@
 package modules;
 
 import beans.AdjacencyListGraph;
+import beans.MysqlConnector;
+import enums.Configurations;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -12,6 +14,27 @@ import java.util.Queue;
 public class GraphParameters {
 
 
+
+    public void computeAllParameters(){
+
+        MysqlConnector sql = new MysqlConnector();
+        String[] tableNames= {"4weeklag"};
+        for (String table : tableNames){
+            AdjacencyListGraph G = sql.readStringRows(table);
+            float clCf = G.getClusteringCoefficientAllNodes(G);
+            System.out.print(table +"  Clutering coefficient:"+ clCf+"\n");
+
+            //float ptLen = G.getCharacteristicPathLength(G);
+            //System.out.print(table +"  CharacteristicPathLength:"+ ptLen+"\n");
+
+            double[] lRandom = G.getGRandom(G);
+            System.out.print(table +"  Gamma Random:"+ lRandom[0]+"\n");
+            System.out.print(table +"  L Random:"+ lRandom[1]+"\n");
+
+        }
+
+
+    }
 
 
 

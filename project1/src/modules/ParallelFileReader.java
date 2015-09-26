@@ -41,7 +41,7 @@ public class ParallelFileReader implements Runnable{
     public ArrayList<float[]> LoadEntireData() {
 
         InputReaderService readerObj = new InputReaderService();
-        String[] fileNames = readerObj.getAllFileNames(Configurations.weekLag);
+        String[] fileNames = readerObj.getAllFileNames();
         int count = 0;
         ArrayList<Thread> threadList = new ArrayList<>();
 

@@ -44,20 +44,23 @@ public class Main {
 
 
 
+
     public static void main(String[] args) {
 
 //        AllPlots ap = new AllPlots();
 //        ap.plotAllGraphs();
         //        java.util.Date date = new java.util.Date();
 //        System.out.println(new Timestamp(date.getTime()));
-    //      initialConfig();
+        // initialConfig();
 ////
 //       // To calculate correlation
-        CorrelationCalculator crObj = new CorrelationCalculator();
-        crObj.computeCorrelation(Configurations.maxCorrelationCoeff);
+//        CorrelationCalculator crObj = new CorrelationCalculator();
+//        int lag = 4;
+//        crObj.computeCorrelation(Configurations.maxCorrelationCoeff,lag);
 
 
-
+        GraphParameters gr = new GraphParameters();
+        gr.computeAllParameters();
         //date = new java.util.Date();
         //System.out.println(new Timestamp(date.getTime()));
 
