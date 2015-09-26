@@ -10,16 +10,17 @@ public interface Configurations {
     String fileNamePattern = "diffw";
     String sampleFileName = Files+"1979/diffw01y1979+landmask";
     int startYear = 1979;
-    int endYear = 1987;
+    int endYear = 1980;
     int numWeeks = 52;
     int areaDimension = 136192;
     int actualDatasize = 66129;
     int timeSeries = (endYear-startYear+1)*numWeeks;
     double minCorrelationCoeff=0.9;
     double maxCorrelationCoeff=0.95;
-    int threadLimit=400;
+    int threadLimit=1;
     boolean FirstRun = false;
     boolean writeToDb = true;
+    int weekLag = 4;
 
 
 }
@@ -31,3 +32,4 @@ public interface Configurations {
 //largeData Param
 //int areaDimension = 136192;
 //int actualDatasize = 66129;
+// tableNames = "1weeklagMin","1weeklagMax"

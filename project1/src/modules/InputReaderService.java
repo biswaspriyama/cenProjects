@@ -90,19 +90,42 @@ public class InputReaderService {
 
     //function to get all file names
 
-    public String[] getAllFileNames(){
+    public String[] getAllFileNames(int lag){
 
-        String[] fileNames = new String[Configurations.timeSeries];
-        int fileNo = 0;
+        ArrayList<String>fileNames = new ArrayList<>();
+
         DecimalFormat formatter = new DecimalFormat("00");
         for (int x = Configurations.startYear; x <= Configurations.endYear; x++) {
-            for (int week = 1; week <= Configurations.numWeeks; week++) {
-                fileNames[fileNo] = Configurations.Files + Integer.toString(x) + "/"+Configurations.fileNamePattern + formatter.format(week) + "y" + Integer.toString(x) + "+landmask";
-                fileNo++;
+            for (int week = 1; week <= Configurations.numWeeks; week=week+lag+1) {
+                String name = Configurations.Files + Integer.toString(x) + "/"+Configurations.fileNamePattern + formatter.format(week) + "y" + Integer.toString(x) + "+landmask";
+                fileNames.add(name);
+
             }
         }
-        return fileNames;
+        String[] fileArray = new String[fileNames.size()];
+        int count=0;
+        for (String f : fileNames) {
+            fileArray[count]=fileNames.get(count);
+        }
+        return fileArray;
     }
+
+    public int totalFileNumber(int lag){
+
+        ArrayList<String>fileNames = new ArrayList<>();
+
+        DecimalFormat formatter = new DecimalFormat("00");
+        int count = 0;
+        for (int x = Configurations.startYear; x <= Configurations.endYear; x++) {
+            for (int week = 1; week <= Configurations.numWeeks; week=week+lag+1) {
+                count ++;
+            }
+        }
+        System.out.print(count);
+        return count;
+
+    }
+
 
     //Function to compute global mean of entire area and save to binary file
 
@@ -112,7 +135,7 @@ public class InputReaderService {
         for (int i = 0; i < Configurations.areaDimension; i++)
             sum[i] = 0;
 
-        String[] fileNames = getAllFileNames();
+        String[] fileNames = getAllFileNames(0);
         int dynamicSize = 0;
         for (String fileName : fileNames) {
             float[] dataList = parseBinary(fileName);

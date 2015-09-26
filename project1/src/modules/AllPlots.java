@@ -78,7 +78,7 @@ public class AllPlots {
         xAxisLabel = "Geographic Locations";
         yAxisLabel = "Degree";
         TableName = "ice9years1large";
-        //inputPlotParameters(chartTitle, xAxisLabel, yAxisLabel, TableName);
+        inputPlotParameters(chartTitle, xAxisLabel, yAxisLabel, TableName);
 
         chartTitle = "Degree Distribution for 1988-1996, r>0.95";
         xAxisLabel = "Geographic Locations";
@@ -90,7 +90,7 @@ public class AllPlots {
         xAxisLabel = "Geographic Locations";
         yAxisLabel = "Degree";
         TableName = "ice9years2large";
-        //inputPlotParameters(chartTitle, xAxisLabel, yAxisLabel, TableName);
+        inputPlotParameters(chartTitle, xAxisLabel, yAxisLabel, TableName);
 
 
         chartTitle = "Degree Distribution for 1997-2005, r>0.95";
@@ -104,7 +104,7 @@ public class AllPlots {
         xAxisLabel = "Geographic Locations";
         yAxisLabel = "Degree";
         TableName = "ice9years3large";
-        //inputPlotParameters(chartTitle, xAxisLabel, yAxisLabel, TableName);
+        inputPlotParameters(chartTitle, xAxisLabel, yAxisLabel, TableName);
 
         chartTitle = "Degree Distribution for entire 1979-2005, r>0.95";
         xAxisLabel = "Geographic Locations";

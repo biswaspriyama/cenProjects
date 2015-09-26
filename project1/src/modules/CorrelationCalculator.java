@@ -20,7 +20,8 @@ public class CorrelationCalculator {
 
     public void computeCorrelation(double threshold) {
 
-        ParallelFileReader pRead = new ParallelFileReader();
+        int num = readObj.totalFileNumber(Configurations.weekLag);
+        ParallelFileReader pRead = new ParallelFileReader(num);
         ArrayList<float[]> completeData = pRead.LoadEntireData();
         int dataSize = Configurations.actualDatasize;
         System.out.print(dataSize);

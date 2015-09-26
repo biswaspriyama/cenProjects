@@ -23,12 +23,13 @@ public class AdjacencyListGraph {
         adj[i].add(j);
         adj[j].add(i);
     }
+    public void setEdgeModified(int i, int j) {
+        adj[i].add(j);
+    }
     public boolean hasEdge(int i, int j) {
         return adj[i].contains(j);
     }
-//    public List<Integer> adjacentTo(int n){
-//        return adj[n];
-//    }
+
 
     public int getDistanceSum(AdjacencyListGraph G, int s) {
 
@@ -74,11 +75,23 @@ public class AdjacencyListGraph {
         }
         System.out.println(pathLength);
         return (0);
-        //return (2*edgeCount/(Configurations.actualDatasize*(Configurations.actualDatasize-1)));
+
+    }
+
+    public void getGRandom(AdjacencyListGraph G){
+        float totalVertices = Configurations.actualDatasize;
+        float[] vertexDegree = G.getAlldegrees(G);
+        float vertexSum = 0;
+        for(int i=0;i<vertexDegree.length;i++){
+            vertexSum += vertexDegree[i];
+        }
+        double meanVertexDegree = vertexSum/totalVertices;
+        double gammaRandom = meanVertexDegree/totalVertices;
+        double LengthRandom = Math.log(totalVertices)/Math.log(meanVertexDegree);
+
     }
 
     public int getClusteringCoefficientSingleNode(AdjacencyListGraph G, int node){
-
 
         int clusterEdgeCount = G.adj[node].size();
         int vertexCount = clusterEdgeCount;

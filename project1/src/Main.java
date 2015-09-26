@@ -50,11 +50,11 @@ public class Main {
 //        ap.plotAllGraphs();
         //        java.util.Date date = new java.util.Date();
 //        System.out.println(new Timestamp(date.getTime()));
-        initialConfig();
-//
+    //      initialConfig();
+////
 //       // To calculate correlation
         CorrelationCalculator crObj = new CorrelationCalculator();
-        crObj.computeCorrelation(Configurations.minCorrelationCoeff);
+        crObj.computeCorrelation(Configurations.maxCorrelationCoeff);
 
 
 

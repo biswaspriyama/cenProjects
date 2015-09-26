@@ -74,6 +74,35 @@ public class MysqlConnector {
 
     }
 
+    public AdjacencyListGraph constructModifiedGraph(String tableName){
+
+        AdjacencyListGraph graph = new AdjacencyListGraph(Configurations.actualDatasize);
+        try {
+            Statement st = conn.createStatement();
+            st.executeQuery("SELECT Nodes FROM "+tableName);//+"WHERE id="+Integer.toString(id));
+            ResultSet rs = st.getResultSet();
+            int count = 0;
+            int i;
+            while (rs.next()) {
+                String nodes = rs.getString("Nodes");
+
+                if (nodes != ""){
+                    nodes = nodes.substring(1); //removing first comma
+                    List<String> edgeList = Arrays.asList(nodes.split(","));
+                    for(i=0;i<edgeList.size();i++)
+                        graph.setEdge(count,Integer.parseInt(edgeList.get(i)));
+                    count ++;
+                }
+            }
+            rs.close();
+            st.close();
+            System.out.println(count + " rows were retrieved");
+        }catch (SQLException se){
+            throw new RuntimeException(se);
+        }
+        return graph;
+    }
+
     public AdjacencyListGraph readStringRows(String tableName){
 
         AdjacencyListGraph graph = new AdjacencyListGraph(Configurations.actualDatasize);
