@@ -18,17 +18,18 @@ public class GraphParameters {
     public void computeAllParameters(){
 
         MysqlConnector sql = new MysqlConnector();
-        String[] tableNames= {"4weeklag"};
+        String[] tableNames = {"ice9years3","ice9years2","ice9years1","4weeklag","Graph_test"};
         for (String table : tableNames){
             AdjacencyListGraph G = sql.readStringRows(table);
-            float clCf = G.getClusteringCoefficientAllNodes(G);
-            System.out.print(table +"  Clutering coefficient:"+ clCf+"\n");
+//            float clCf = G.getClusteringCoefficientAllNodes(G);
+//            System.out.print(table +"  Clustering coefficient:"+ clCf+"\n");
 
-            //float ptLen = G.getCharacteristicPathLength(G);
-            //System.out.print(table +"  CharacteristicPathLength:"+ ptLen+"\n");
 
+            double ptLen = G.getCharacteristicPathLength(G);
+            System.out.print(table +"  CharacteristicPathLength:"+ ptLen+"\n");
+//
             double[] lRandom = G.getGRandom(G);
-            System.out.print(table +"  Gamma Random:"+ lRandom[0]+"\n");
+//            System.out.print(table +"  Gamma Random:"+ lRandom[0]+"\n");
             System.out.print(table +"  L Random:"+ lRandom[1]+"\n");
 
         }

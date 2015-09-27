@@ -29,6 +29,11 @@ public class AdjacencyListGraph {
     public boolean hasEdge(int i, int j) {
         return adj[i].contains(j);
     }
+    public boolean noNeighbours(int v) {
+        if (adj[v].size() == 0)
+            return true;
+        return false;
+    }
 
 
     public int getDistanceSum(AdjacencyListGraph G, int s) {
@@ -49,6 +54,7 @@ public class AdjacencyListGraph {
                 }
             }
         }
+
         return sumDistance;
     }
 
@@ -60,21 +66,26 @@ public class AdjacencyListGraph {
         return allDegrees;
     }
 
-    public float getCharacteristicPathLength(AdjacencyListGraph G) {
+    public double getCharacteristicPathLength(AdjacencyListGraph G) {
 
         int size = Configurations.actualDatasize;
         //int pathLength=0;
-        BigInteger pathLength=BigInteger.ZERO;
-        int sumDist=0;
+        double pathLength=0;
+        double sumDist=0;
+        int count = 0;
         for(int i=0;i< adj.length;i++)
         {
-            sumDist=getDistanceSum(G, i);
-            //pathLength=pathLength+sumDist;
-            pathLength=pathLength.add(BigInteger.valueOf(sumDist));
-            //System.out.println(i);
+            if(!noNeighbours(i))
+                sumDist=getDistanceSum(G, i);
+                pathLength=pathLength+sumDist;
+                //System.out.print(i +":"+ sumDist+"\n");
+                count ++;
+
         }
-        System.out.println(pathLength);
-        return (0);
+        System.out.print("count:" + count+"\n");
+
+        double charLength = 2*pathLength/(count*(count-1));
+        return (charLength);
 
     }
 
@@ -99,7 +110,7 @@ public class AdjacencyListGraph {
     public float getClusteringCoefficientSingleNode(AdjacencyListGraph G, int node){
 
         float clusterEdgeCount = G.adj[node].size();
-        float vertexCount = clusterEdgeCount;
+        float vertexCount = 1 + clusterEdgeCount;
 
         for(int i=0;i< G.adj[node].size();i++)
         {
@@ -111,16 +122,12 @@ public class AdjacencyListGraph {
                     clusterEdgeCount++;
             }
         }
+        if (vertexCount <= 1)
+            return 0;
 
-        System.out.print(vertexCount+":"+clusterEdgeCount);
-//        float coefficient = 0;
-//        try {
-//                coefficient = 2 * clusterEdgeCount / (vertexCount * (vertexCount - 1));
-//        }catch (ArithmeticException e)
-//        {
-//            return 0;
-//        }
-        return 0;
+        float coefficient = 2 * clusterEdgeCount / (vertexCount * (vertexCount - 1));
+        //System.out.print(vertexCount+":"+coefficient+"\n");
+        return coefficient;
     }
 
     public float getClusteringCoefficientAllNodes(AdjacencyListGraph G){
@@ -128,15 +135,18 @@ public class AdjacencyListGraph {
         float clusteringCoeff=0;
         float singleCluster=0;
 
+        int nonZeroVertex = 0;
         for(int i=0;i< adj.length;i++)
         {
             singleCluster=getClusteringCoefficientSingleNode(G, i);
+            if (singleCluster != 0)
+                nonZeroVertex ++;
             clusteringCoeff+=singleCluster;
 
         }
 
-        clusteringCoeff = clusteringCoeff/(float)size;
-        return clusteringCoeff/Configurations.actualDatasize;
+        clusteringCoeff = clusteringCoeff/size;
+        return clusteringCoeff;
 
     }
 

@@ -33,45 +33,30 @@ public class Main {
     }
 
     public static void initialConfig(){
-       // writeMeanToFile();
+        writeMeanToFile();
         configureMysql();
 
     }
 
 
 
-
-
-
-
-
     public static void main(String[] args) {
+        initialConfig();
 
-//        AllPlots ap = new AllPlots();
-//        ap.plotAllGraphs();
-        //        java.util.Date date = new java.util.Date();
-//        System.out.println(new Timestamp(date.getTime()));
-        // initialConfig();
-////
-//       // To calculate correlation
-//        CorrelationCalculator crObj = new CorrelationCalculator();
-//        int lag = 4;
-//        crObj.computeCorrelation(Configurations.maxCorrelationCoeff,lag);
+        //To calculate correlation
+        CorrelationCalculator crObj = new CorrelationCalculator();
+        int lag = 4;
+        crObj.computeCorrelation(Configurations.maxCorrelationCoeff,lag);
 
 
         GraphParameters gr = new GraphParameters();
         gr.computeAllParameters();
-        //date = new java.util.Date();
-        //System.out.println(new Timestamp(date.getTime()));
 
 
-//        MysqlConnector sql = new MysqlConnector();
-//        AdjacencyListGraph G = sql.readStringRows(MySqlConfig.testTable);
-//        System.out.print("i am starting");
-//        //float num = G.getClusteringCoefficientAllNodes(G);
-//        //System.out.print(num+"\n");
-//        float num = G.getCharacteristicPathLength(G);
-//        System.out.print(num);
+        AllPlots ap = new AllPlots();
+        ap.plotAllGraphs();
+
+
 
 
 

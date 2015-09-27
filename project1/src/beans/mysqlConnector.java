@@ -76,12 +76,31 @@ public class MysqlConnector {
 
     public AdjacencyListGraph constructModifiedGraph(String tableName){
 
-        AdjacencyListGraph graph = new AdjacencyListGraph(Configurations.actualDatasize);
+        int count = 0;
         try {
             Statement st = conn.createStatement();
             st.executeQuery("SELECT Nodes FROM "+tableName);//+"WHERE id="+Integer.toString(id));
             ResultSet rs = st.getResultSet();
-            int count = 0;
+            int i;
+            while (rs.next()) {
+                String nodes = rs.getString("Nodes");
+                if (nodes != ""){
+                    count ++;
+                }
+            }
+            rs.close();
+            st.close();
+        }catch (SQLException se){
+            throw new RuntimeException(se);
+        }
+        System.out.print(count);
+        AdjacencyListGraph graph = new AdjacencyListGraph(count);
+
+        try {
+            Statement st = conn.createStatement();
+            st.executeQuery("SELECT Nodes FROM "+tableName);//+"WHERE id="+Integer.toString(id));
+            ResultSet rs = st.getResultSet();
+            count = 0;
             int i;
             while (rs.next()) {
                 String nodes = rs.getString("Nodes");
@@ -90,7 +109,7 @@ public class MysqlConnector {
                     nodes = nodes.substring(1); //removing first comma
                     List<String> edgeList = Arrays.asList(nodes.split(","));
                     for(i=0;i<edgeList.size();i++)
-                        graph.setEdgeModified(count,Integer.parseInt(edgeList.get(i)));
+                        graph.setEdge(count,Integer.parseInt(edgeList.get(i)));
                     count ++;
                 }
             }
@@ -100,6 +119,9 @@ public class MysqlConnector {
         }catch (SQLException se){
             throw new RuntimeException(se);
         }
+
+
+
         return graph;
     }
 
