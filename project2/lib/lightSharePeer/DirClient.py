@@ -7,6 +7,10 @@ from os import listdir
 from os.path import isfile, join
 import json
 from Config import *
+from httpClient import *
+from httpServer import *
+from threading import Thread
+
 import yaml
 import time
 
@@ -54,30 +58,30 @@ class createDataPacket:
 
 
 
-
+def getFreePort():
+    s = socket.socket()
+    s.bind(("", 0))
+    port = s.getsockname()
+    s.close()
+    return port
 
 
 
 class DirClient:
 
-    def __init__(self , host, port):
+    def __init__(self , host, port, peerPort):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.serverHost = host
         self.serverPort = port
         self.sock.connect((self.serverHost, self.serverPort))
 
         #param releated to the peer client/server
-        self.peerPort = str(self.getFreePort()[1])
+        self.peerPort = str(peerPort)
         self.hostname = socket.gethostname()
         self.IP = socket.gethostbyname(self.hostname)
 
 
-    def getFreePort(self):
-        s = socket.socket()
-        s.bind(("", 0))
-        port = s.getsockname()
-        s.close()
-        return port
+
 
     def informAndUpdate(self , dirPath):
         files = getFileAndSize(dirPath)
@@ -119,15 +123,34 @@ class DirClient:
 
 def main():
 
-    server = "localhost"
-    port = 8888
-    obj = DirClient(server, port)
-    # obj.informAndUpdate(dirPath)
-    obj.queryForContent()
-    # time.sleep(10)
-    # obj.gracefulExit()
+    peerPort = getFreePort()[1]
+    obj = DirClient(DirServerIp, DirServerPort, peerPort)
+    obj.informAndUpdate(dirPath)
+    hostname = socket.gethostname()
+    IP = socket.gethostbyname(hostname)
+    httpd = ThreadedHTTPServer((IP, peerPort), Handler)
+    threading.Thread(target=httpd.serve_forever).start()
 
-    #time.sleep(100)
+    obj.queryForContent()
+    while True:
+        i = raw_input("Enter y to download (or n to quit): ")
+        if i != "y":
+            obj.gracefulExit()
+            httpd.shutdown()
+            break
+        file = raw_input("Enter file Name:")
+        peer = raw_input("Enter Peer:")
+        port = input("Enter port:")
+        httpObj = lightShareHttpClient(peer, port)
+        httpObj.downloadFile(file , "z.txt")
+
+
+
+
+    httpd.shutdown()
+
+
+
 
 
 if __name__ == "__main__":

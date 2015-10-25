@@ -3,7 +3,7 @@ from SocketServer import ThreadingMixIn
 import threading
 import urlparse
 from Config import *
-
+from threading import Thread
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -30,7 +30,17 @@ class Handler(BaseHTTPRequestHandler):
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Handle requests in a separate thread."""
 
+
+
+
 if __name__ == '__main__':
-    server = ThreadedHTTPServer(('192.168.0.11', 52129), Handler)
-    print 'Starting server, use <Ctrl-C> to stop'
-    server.serve_forever()
+
+
+    httpd = ThreadedHTTPServer(('localhost', 9999), Handler)
+    threading.Thread(target=httpd.serve_forever).start()
+    print "hi"
+    httpd.shutdown()
+    print "bye"
+
+
+

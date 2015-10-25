@@ -28,7 +28,7 @@ class lightShareHttpClient:
 
 
 def main():
-    obj = lightShareHttpClient("192.168.0.11", 52129)
+    obj = lightShareHttpClient("localhost", 9999)
     obj.downloadFile("a.txt" , "b.txt")
 
 
