@@ -19,6 +19,7 @@ def getFreePort():
     return port
 
 def main():
+    
     peerPort = getFreePort()[1]
     obj = DirClient(DirServerIp, DirServerPort, peerPort)
     obj.informAndUpdate(dirPath)
@@ -27,7 +28,9 @@ def main():
     httpd = ThreadedHTTPServer((IP, peerPort), Handler)
     threading.Thread(target=httpd.serve_forever).start()
 
-    obj.queryForContent()
+    i = raw_input("Enter File name to search/Press Enter for Directory Listing")
+    obj.queryForContent(i)
+
     while True:
         i = raw_input("Enter y to download (or n to quit): ")
         if i != "y":
@@ -38,7 +41,7 @@ def main():
         peer = raw_input("Enter Peer:")
         port = input("Enter port:")
         httpObj = lightShareHttpClient(peer, port)
-        httpObj.downloadFile(file , "z.txt")
+        httpObj.downloadFile(file , "tx.txt")
 
 
 

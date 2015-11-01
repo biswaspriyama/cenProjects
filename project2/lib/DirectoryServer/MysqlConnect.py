@@ -35,13 +35,18 @@ class MysqlConnect:
         self.cursor.execute (sql)
         self.db.commit ()
 
-    def readFileTable(self , tableName, count = "all" , keyWord = ""):
+    def readFileTable(self , tableName, host, count = "all" , keyWord = ""):
         sql = ""
         if keyWord == "" and count == "all":
-            sql = "SELECT * FROM "+tableName
+            sql = "SELECT * FROM "+tableName+" where host != '"+host+"';"
+
 
         elif count != "all" and keyWord == "":
-            sql = "SELECT * FROM "+tableName+" LIMIT "+str(count)
+            sql = "SELECT * FROM "+tableName+  " where host != '"+host+"' LIMIT "+str(count)
+
+        elif keyWord != "":
+            sql = "SELECT * FROM "+tableName+" WHERE files LIKE '"+str(count)+"%' and  host != '"+host+"'"
+            print sql
 
         self.cursor.execute(sql)
         results = self.cursor.fetchall()
@@ -75,11 +80,14 @@ def main():
     name = "yugarsis-MacBook-Air.local"
     files = "{u'c.pdf': 0, u'a.txt': 9, u'b.txt': 0}"
     obj= MysqlConnect(serverIp, myDb, mySqlUser, mySqlpwd)
-    #obj.createFileTable("fileStore")
+    # obj.createFileTable("fileStore")
     # obj.writeDataFileTable(tableName, hostad, name,files)
     # obj.deleteFromFileTable(tableName, "192.168.0.11:52151")
-    obj.readFileTable(tableName,10)
-
+    count = "50"
+    key = ""
+    host = "192.168.0.11:55476"
+    allFiles = obj.readFileTable(tableName, host, count, key)
+    print allFiles
     print "done"
 
 if __name__ == '__main__':
