@@ -17,7 +17,7 @@ import yaml
 import time
 import random
 import threading
-import timer
+import timerClient
 
 hash = {}
 
@@ -238,23 +238,44 @@ class DirClient:
         if shuffle == 1:
             random.shuffle(messages)
 
-        timeout = 0.1
-        #reliable transfer until all messages has been sent and ack/cumulative acks has been received
-        tim = timer.TimerReset(timeout, self.retransmitIfTimedOut)
+        bufferWait = 1
+        timeout = rdtTimeout
+
+        future = time.time()+ maxRetry
+        #reliable transfer until all messages has been sent and ack/cumulative acks has been received and waits until maxTimeout
+        tim = timerClient.TimerReset(timeout, self.retransmitIfTimedOut)
         tim.start()
-        while(len(sendBases)!= 0):
-            print sendBases
-            sb = sendBases[0]
-            print(messages[sb])
-            self.sock.sendall(messages[sb] + "\n")
-            print "sent"
-            received = self.sock.recv(messageLimit)
-            ack = received.split(":")[1]
-            sb = int(ack)
-            print int(ack)
-            sendBases = sbCopy[sb:]
-            if (counter == False):
-                tim.reset()
+        receivedMsg = ""
+        status = {}
+        while(len(sendBases)!= 0 and time.time() < future ):
+            try:
+                if (sendBases != []):
+                    sb = sendBases[0]
+                    print("Sent msg:" +messages[sb])
+                    self.sock.sendall(messages[sb] + "\n")
+                    #self.sock.setblocking(0)
+                    self.sock.settimeout(bufferWait)
+                    receivedMsg = self.sock.recv(messageLimit)
+                    print "Received msg= "+receivedMsg
+                    data = receivedMsg.split(";")
+                    ackSeq = data[1]
+                    status["Status"] = data[3]
+                    status["Phrase"] = data[4]
+                    sb = int(ackSeq)
+                    sendBases = sbCopy[sb:]
+
+            except socket.timeout,msg:
+                print "Received msg= "+receivedMsg
+                if (counter == False):
+                    tim.reset(timeout)
+
+        tim.cancel() #stop retry timer
+        if len(sendBases) == 0:
+            print "Message Updated to server Successfully"
+            print status
+        else:
+            print "Max timeout exceeded"
+        return
 
     def informAndUpdate(self , dirPath):
         files = getFileAndSize(dirPath)
@@ -269,7 +290,7 @@ class DirClient:
         message = msgObj.createMessage("EXIT", address, self.hostname)
         self.reliableTransfer(message)
 
-    def queryForContent(self, search = "", count = "50"):
+    def queryForContent(self, search = "", count = "25"):
         msgObj = createAppMesage(201)
         address = self.IP+":"+self.peerPort
         query = search+"|"+count
@@ -286,11 +307,11 @@ def main():
 
     peerPort = getFreePort()[1]
     obj = DirClient(DirServerIp, DirServerPort, peerPort)
-    obj.informAndUpdate(dirPath)
-    # time.sleep(10)
-    # obj.gracefulExit()
+    #obj.informAndUpdate(dirPath)
+    # # # time.sleep(10)
+    #obj.gracefulExit()
 
-    #obj.queryForContent("")
+    obj.queryForContent("zab")
 
     # hostname = socket.gethostname()
     # IP = socket.gethostbyname(hostname)

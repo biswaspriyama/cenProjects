@@ -76,19 +76,17 @@ class MysqlConnect:
         self.db.close ()
 def main():
 
-    hostad = "192.168.0.11:59227"
-    name = "yugarsis-MacBook-Air.local"
-    files = "{u'c.pdf': 0, u'a.txt': 9, u'b.txt': 0}"
-    obj= MysqlConnect(serverIp, myDb, mySqlUser, mySqlpwd)
+
+    obj= MysqlConnect("localhost", myDb, mySqlUser, mySqlpwd)
     obj.createFileTable("fileStore")
     # obj.writeDataFileTable(tableName, hostad, name,files)
     # obj.deleteFromFileTable(tableName, "192.168.0.11:52151")
-    count = "50"
-    key = ""
-    host = "192.168.0.11:55476"
-    allFiles = obj.readFileTable(tableName, host, count, key)
-    print allFiles
-    print "done"
+    # count = "50"
+    # key = ""
+    # host = "192.168.0.11:55476"
+    # allFiles = obj.readFileTable(tableName, host, count, key)
+    # print allFiles
+    # print "done"
 
 if __name__ == '__main__':
     main()

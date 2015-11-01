@@ -26,19 +26,24 @@ class _TimerReset(Thread):
     def cancel(self):
         """Stop the timer if it hasn't finished yet"""
         self.finished.set()
+        print "Timer Stopped!"
 
     def run(self):
-        print "Time: %s - timer running..." % time.asctime()
-
+        print "Timer started..."
         while self.resetted:
-            print "Resend packet if not received in %s seconds" %self.interval
+            print "Resend packet if ACK not received in %s seconds" %self.interval
             self.resetted = False
             self.finished.wait(self.interval)
 
         if not self.finished.isSet():
             self.function(*self.args, **self.kwargs)
+
+
+
         self.finished.set()
-        print "Timer finished!"
+        #self.reset(self.interval)
+        #print "Timer Expired"
+
 
     def reset(self, interval=None):
         """ Reset the timer """

@@ -4,12 +4,11 @@ import yaml
 from MysqlConnect import *
 from Config import *
 import time
-import Queue
 import SocketServer
-from collections import OrderedDict
 import math
 import random
-import timer
+import timerServer
+
 
 class ProcessNew:
     def __init__(self , packetData):
@@ -156,16 +155,18 @@ class ProcessNew:
     def fragmentString(self, data, packetLimit):
         dataFragments=[data[x:x+packetLimit] for x in range(0,len(data),packetLimit)]
         return dataFragments
+
     def retransmitIfTimedOut(self):
         try:
-            index  = globals()[clientAddr+":"+str(portG)+"_sendbases"][0]
+            index  = globals()[bufferName+"_sendbases"][0]
             skt.sendto(syncdata[index], clientAddr)
             print "retransmitting data"
             counter = False
+            print counter
         except:
             print "Not re-transmitting as all data sent already"
 
-    def reliableTransfer(self, socket, clientAddr, port, messages, shuffle = 0):
+    def reliableTransfer(self, socket, clientAddr, messages, shuffle = 0):
 
         global counter
         counter = True
@@ -179,25 +180,35 @@ class ProcessNew:
         clAd = clientAddr[0]
 
 
-        futureTime = time.time()+MaxRetry
+        futureTime = time.time()+ MaxRetry
 
         timeout = 0.1
 
         #reliable transfer until all messages has been sent and ack/cumulative acks has been received
-        tim = timer.TimerReset(timeout, self.retransmitIfTimedOut)
+        tim = timerServer.TimerReset(timeout, self.retransmitIfTimedOut)
         tim.start()
 
-        while(len(globals()[clAd+":"+str(port)+"_sendbases"])!= 0  and time.time()<futureTime):
+        clientReceiveWindow = clientWindow
+        count = 0
+        while(len(globals()[bufferName+"_sendbases"])!= 0  and time.time()<futureTime):
 
-            sendBases = globals()[clAd+":"+str(port)+"_sendbases"]
-            print sendBases
-            if sendBases != []:
-                sb = sendBases[0]
-                print(messages[sb])
-                socket.sendto(messages[sb], clientAddr)
-                #time.sleep(timeout)
+            while(count < clientReceiveWindow and count<len(messages)):
+
+                print(messages[count])
+                socket.sendto(messages[count], clientAddr)
+                count = count+1
+                print counter
                 if (counter == False):
-                    tim.reset()
+                    tim.reset(timeout)
+
+            clientReceiveWindow = globals()[bufferName+"_sendbases"][0]+ clientReceiveWindow
+            print globals()[bufferName+"_sendbases"]
+            print clientReceiveWindow
+
+        if len(globals()[bufferName+"_sendbases"]) == 0:
+            print "All data Updated to server Successfully"
+        else:
+            print "Max timeout exceeded"
 
 
 class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
@@ -206,14 +217,11 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
         data = self.request[0].strip()
         port = self.client_address[1] ### get port number (a variable of socket server class
         socket = self.request[1]  ### get the communicate socket
-
-
         client_address = (self.client_address[0])
         cur_thread = threading.current_thread()
+        global bufferName
+        bufferName = client_address+":"+str(port)
 
-
-        #obj = ServerPacketProcessing(data)
-        #resp = obj.processPacket()
         obj = ProcessNew(data)
         method = obj.receivedMsg["Method"]
         if method == "INUP":
@@ -225,29 +233,29 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
                 data = info.split("|")[1]
 
                 try:
-                    globals()[client_address+":"+str(port)][seq] = data
+                    globals()[bufferName][seq] = data
                     print "existing_client"
                     if(fin):
-                        globals()[client_address+":"+str(port)]["last"] = int(fin)
+                        globals()[bufferName]["last"] = int(fin)
 
-                    buf = globals()[client_address+":"+str(port)]
+                    buf = globals()[bufferName]
                     counter = obj.getExpectedSeqNum(buf)
 
 
                 except Exception,e:
                     print e
                     print "new_client"
-                    globals()[client_address+":"+str(port)] = {}
-                    globals()[client_address+":"+str(port)][seq] = data
+                    globals()[bufferName] = {}
+                    globals()[bufferName][seq] = data
                     if(fin):
-                        globals()[client_address+":"+str(port)]["last"] = int(fin)
+                        globals()[bufferName]["last"] = int(fin)
 
 
-                    buf = globals()[client_address+":"+str(port)]
+                    buf = globals()[bufferName]
                     counter = obj.getExpectedSeqNum(buf)
 
                 try:
-                    lastSyn = globals()[client_address+":"+str(port)]["last"]
+                    lastSyn = globals()[bufferName]["last"]
                     if (counter == lastSyn+1):
                         data = obj.reassembleData(buf)
 
@@ -259,49 +267,50 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
                         print "Ignoring duplicate packets"
                     else:
                         print "Waiting for more packets"
-                resp = "ACK:"+str(counter)
+
+                seqNum = '%03d' % counter
+                respHeader = obj.createResponseHeader("INUP", seqNum, '0')
+                response = respHeader+"200;OK"
 
             else:
                 try:
                     obj.updateDatabase(hash)
                 except Exception,e:
                     print "ignoring Duplicates"
-                resp = "ACK:1"
+                respHeader = obj.createResponseHeader("INUP", "001", '0')
+                response = respHeader+"200;OK"
 
         elif method == "EXIT":
             obj.removePeerDatabase()
-            resp = "ACK:1"
+            respHeader = obj.createResponseHeader("EXIT", '001', '0')
+            response = respHeader+"200;OK"
+            print response
 
         elif method == "QCON":
             resp = obj.queryForContent()
             fragments = obj.fragmentContent(resp)
-            globals()[client_address+":"+str(port)+"_sendbases"] = range(len(fragments))
-            globals()[client_address+":"+str(port)+"_sbCopy"] = range(len(fragments))
-
-
-
+            globals()[bufferName+"_sendbases"] = range(len(fragments))
+            globals()[bufferName+"_sbCopy"] = range(len(fragments))
 
             global clientAddr
             clientAddr = self.client_address
             global skt
             skt = socket
-            global portG
-            portG = port
-
-            obj.reliableTransfer(socket, self.client_address, port, fragments)
+            print fragments
+            return
+            obj.reliableTransfer(socket, self.client_address, fragments)
             # for fragment in fragments:
             #     print fragment
             #     socket.sendto(fragment, self.client_address)
             return
         elif method == "QRES":
-
-
+            print "ACK FROM CLIENT:"+ data
             seq = int(obj.receivedMsg["SEQ"])
-            globals()[client_address+":"+str(port)+"_sendbases"] = globals()[client_address+":"+str(port)+"_sbCopy"][seq:]
+            globals()[bufferName+"_sendbases"] = globals()[bufferName+"_sbCopy"][seq:]
             return
-
+        serverDelay = random.randint(1,11)/100.0
         time.sleep(serverDelay)
-        socket.sendto(resp, self.client_address)
+        socket.sendto(response, self.client_address)
 
 
 
