@@ -247,6 +247,7 @@ class DirClient:
             sb = sendBases[0]
             print(messages[sb])
             self.sock.sendall(messages[sb] + "\n")
+            print "sent"
             received = self.sock.recv(messageLimit)
             ack = received.split(":")[1]
             sb = int(ack)
@@ -285,11 +286,11 @@ def main():
 
     peerPort = getFreePort()[1]
     obj = DirClient(DirServerIp, DirServerPort, peerPort)
-    #obj.informAndUpdate(dirPath)
+    obj.informAndUpdate(dirPath)
     # time.sleep(10)
     # obj.gracefulExit()
 
-    obj.queryForContent("")
+    #obj.queryForContent("")
 
     # hostname = socket.gethostname()
     # IP = socket.gethostbyname(hostname)

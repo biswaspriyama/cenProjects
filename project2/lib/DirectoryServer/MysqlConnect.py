@@ -80,7 +80,7 @@ def main():
     name = "yugarsis-MacBook-Air.local"
     files = "{u'c.pdf': 0, u'a.txt': 9, u'b.txt': 0}"
     obj= MysqlConnect(serverIp, myDb, mySqlUser, mySqlpwd)
-    # obj.createFileTable("fileStore")
+    obj.createFileTable("fileStore")
     # obj.writeDataFileTable(tableName, hostad, name,files)
     # obj.deleteFromFileTable(tableName, "192.168.0.11:52151")
     count = "50"

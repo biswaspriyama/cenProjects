@@ -1,9 +1,9 @@
-serverIp ="localhost"
+serverIp ="68.225.193.176"
 mySqlUser = "root"
 mySqlpwd = ""
 myDb = "DirServer"
 tableName = "fileStore"
-ServerPort = 8888
+serverPort = 8888
 
 serverDelay = 0.2
 MaxRetry = 15

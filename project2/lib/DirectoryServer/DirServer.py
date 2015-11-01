@@ -310,7 +310,7 @@ class ThreadedUDPServer(SocketServer.ThreadingMixIn,SocketServer.UDPServer):
 
 
 def main():
-    HOST, PORT = "localhost", ServerPort
+    HOST, PORT = serverIp, serverPort
 
     server = ThreadedUDPServer((HOST, PORT),ThreadedUDPRequestHandler)
     ip, port = server.server_address
