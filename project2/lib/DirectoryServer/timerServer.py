@@ -2,17 +2,11 @@ from threading import Thread, Event, Timer
 import time
 
 def TimerReset(*args, **kwargs):
-    """ Global function for Timer """
     return _TimerReset(*args, **kwargs)
 
 
 class _TimerReset(Thread):
-    """Call a function after a specified number of seconds:
 
-    t = TimerReset(30.0, f, args=[], kwargs={})
-    t.start()
-    t.cancel() # stop the timer's action if it's still waiting
-    """
 
     def __init__(self, interval, function, args=[], kwargs={}):
         Thread.__init__(self)
@@ -24,13 +18,13 @@ class _TimerReset(Thread):
         self.resetted = True
 
     def cancel(self):
-        """Stop the timer if it hasn't finished yet"""
+        """Stop the timer if it not finished yet"""
         self.finished.set()
 
     def run(self):
         print "Time: %s - timer running..." % time.asctime()
         while self.resetted:
-            print "Resend packet if not received in %s seconds" %self.interval
+            print "Resend packet if ACK not received in %s seconds" %self.interval
             self.resetted = False
             self.finished.wait(self.interval)
 
@@ -46,7 +40,7 @@ class _TimerReset(Thread):
             print "Time: %s - timer resetting to %.2f..." % (time.asctime(), interval)
             self.interval = interval
         else:
-            print "Time: %s - timer resetting..." % time.asctime()
+            print "Timer resetting..."
 
         self.resetted = True
         self.finished.set()

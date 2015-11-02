@@ -7,12 +7,6 @@ def TimerReset(*args, **kwargs):
 
 
 class _TimerReset(Thread):
-    """Call a function after a specified number of seconds:
-
-    t = TimerReset(30.0, f, args=[], kwargs={})
-    t.start()
-    t.cancel() # stop the timer's action if it's still waiting
-    """
 
     def __init__(self, interval, function, args=[], kwargs={}):
         Thread.__init__(self)
@@ -38,11 +32,7 @@ class _TimerReset(Thread):
         if not self.finished.isSet():
             self.function(*self.args, **self.kwargs)
 
-
-
         self.finished.set()
-        #self.reset(self.interval)
-        #print "Timer Expired"
 
 
     def reset(self, interval=None):
@@ -52,21 +42,9 @@ class _TimerReset(Thread):
             print "Time: %s - timer resetting to %.2f..." % (time.asctime(), interval)
             self.interval = interval
         else:
-            print "Time: %s - timer resetting..." % time.asctime()
+            print " Timer resetting..."
 
         self.resetted = True
         self.finished.set()
         self.finished.clear()
 
-
-# def hello(x):
-#     print "i am in function" + x
-#
-# tim = TimerReset(5, hello,"a")
-# tim.start()
-# print "i am outside"
-# # print "Time: %s - sleeping for 10..." % time.asctime()
-# # time.sleep (10)
-# print "Time: %s - end..." % time.asctime()
-#
-# print "\n\n"
