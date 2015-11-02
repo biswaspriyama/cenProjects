@@ -4,4 +4,4 @@ dirPath = "/Users/yugarsi/git-local/cenProjects/project2/lib/localFileStore/"
 maxRetry = 10  #max timeout for inform and update.. After which retry stops
 rdtTimeout = 0.1
 pathMTU = 128
-messageLimit = pathMTU - 20 - 20
+messageLimit = pathMTU - 20 - 8  #MTU minus IP Header minus UDP Header

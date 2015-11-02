@@ -9,4 +9,4 @@ serverDelay = 0
 clientWindow = 5
 MaxRetry = 15
 pathMTU = 128
-messageLimit = pathMTU - 20 - 20
+messageLimit = pathMTU - 20 - 8 #MTU minus IP Header minus UDP Header

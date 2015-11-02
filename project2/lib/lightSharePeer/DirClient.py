@@ -176,11 +176,17 @@ class DirClient:
             except:
                 continue
 
+
+        print "**********************\n\n"
+
+        print "***** FILES FOUND **** "
         print data
+        print "**********************"
+
         return
-        data = yaml.load(data)
-        print data
-        return data
+        # data = yaml.load(data)
+        # print data
+        # return data
 
     def receiveServerContent(self):
 
@@ -195,16 +201,22 @@ class DirClient:
                 received = self.sock.recv(messageLimit)
                 print "Received Message = "+received
                 received = received.split(";")
-
+                type = received[0]
                 seq = received[2]
                 flag = received[3]
                 if (seq == "000" and flag == "0"):
                     files = received[6]
-                    files = yaml.load(files)
+                    #files = yaml.load(files)
                     msgObj = createAppMesage(600)
                     message = msgObj.createMessage("QRES", self.address, self.hostname,"",1)
                     self.sock.send(message + "\n")
-                    return files
+
+                    if type == "QCON":
+                        print "**********************\n\n"
+
+                        print "***** FILES FOUND **** "
+                        print files
+                        print "**********************"
 
                 else:
                     responseFiles[seq] = received[6]
@@ -233,9 +245,10 @@ class DirClient:
 
 
         files =  self.reassembleData(responseFiles)
-        return
-        # files["Status"] = status
-        # files["Phrase"] = phrase
+        resp = {}
+        resp["Status"] = status
+        resp["Phrase"] = phrase
+        print resp
         # return files
 
     def reliableTransfer(self , messages, type = "default", shuffle = 0):
@@ -326,37 +339,9 @@ def main():
 
     peerPort = getFreePort()[1]
     obj = DirClient(DirServerIp, DirServerPort, peerPort)
-
     obj.informAndUpdate(dirPath)
-    #
-    # print "inform and update done"
-    #time.sleep(3)
     obj.queryForContent("")
 
-#    obj.gracefulExit()
-
-    # hostname = socket.gethostname()
-    # IP = socket.gethostbyname(hostname)
-    # httpd = ThreadedHTTPServer((IP, peerPort), Handler)
-    # threading.Thread(target=httpd.serve_forever).start()
-    #
-    # obj.queryForContent()
-    # while True:
-    #     i = raw_input("Enter y to download (or n to quit): ")
-    #     if i != "y":
-    #         obj.gracefulExit()
-    #         httpd.shutdown()
-    #         break
-    #     file = raw_input("Enter file Name:")
-    #     peer = raw_input("Enter Peer:")
-    #     port = input("Enter port:")
-    #     httpObj = lightShareHttpClient(peer, port)
-    #     httpObj.downloadFile(file , "z.txt")
-    #
-    #
-    #
-    #
-    # httpd.shutdown()
 
 
 
