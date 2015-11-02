@@ -9,7 +9,6 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             path = dirPath+self.path
-            print path
             parsed_path = urlparse.urlparse(path)
             file = open(path, "rb").read()
             self.send_response(200)

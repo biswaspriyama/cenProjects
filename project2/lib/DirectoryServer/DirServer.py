@@ -8,13 +8,15 @@ import SocketServer
 import math
 import random
 import timerServer
-
+import socket
 
 class ProcessNew:
     def __init__(self , packetData):
         self.packet = packetData
         self.receivedMsg = self.extractData()
         print self.receivedMsg["Data"]
+        self.hostname = socket.gethostname()
+        self.IP = socket.gethostbyname(self.hostname)
 
     def getHeader(self):
         msg = self.receivedMsg
@@ -115,17 +117,28 @@ class ProcessNew:
         fileStr = fileStr.strip("\n")
         return fileStr
 
-    def createResponseHeader(self, method="QCON", seqNum='000',flag='0'):
+    def createResponseHeader(self, method="QCON", seqNum='000',flag='0', status= "200", phrase = "OK" ):
         header = []
         header.append(method)
+        header.append(self.IP)
         header.append(seqNum)
         header.append(flag)
+        header.append(status)
+        header.append(phrase)
+
         header = ";".join(header)
         header = header+";"
         return header
 
     def fragmentContent(self , totalData):
+
+
         limit = messageLimit
+
+        if totalData == "{}":
+            header = self.createResponseHeader("QCON", "000" , "0","404","NO File Found")
+            return [header]
+
         header = self.createResponseHeader("QCON", '000', '0')
         headerLen = len(header)
         message = header+totalData
@@ -168,6 +181,7 @@ class ProcessNew:
 
     def reliableTransfer(self, socket, clientAddr, messages, shuffle = 0):
 
+        print messages
         global counter
         counter = True
         global syncdata
@@ -175,9 +189,9 @@ class ProcessNew:
 
         if shuffle == 1:
             random.shuffle(messages)
-
-        port = clientAddr[1]
-        clAd = clientAddr[0]
+        #
+        # port = clientAddr[1]
+        # clAd = clientAddr[0]
 
 
         futureTime = time.time()+ MaxRetry
@@ -200,13 +214,13 @@ class ProcessNew:
                 print counter
                 if (counter == False):
                     tim.reset(timeout)
-
-            clientReceiveWindow = globals()[bufferName+"_sendbases"][0]+ clientReceiveWindow
-            print globals()[bufferName+"_sendbases"]
-            print clientReceiveWindow
+            if clientReceiveWindow < len(messages):
+                clientReceiveWindow = globals()[bufferName+"_sendbases"][0]+ clientReceiveWindow
+            # print globals()[bufferName+"_sendbases"]
+            # print clientReceiveWindow
 
         if len(globals()[bufferName+"_sendbases"]) == 0:
-            print "All data Updated to server Successfully"
+            print "All data Sent to Client Successfully"
         else:
             print "Max timeout exceeded"
 
@@ -221,6 +235,8 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
         cur_thread = threading.current_thread()
         global bufferName
         bufferName = client_address+":"+str(port)
+
+        print bufferName
 
         obj = ProcessNew(data)
         method = obj.receivedMsg["Method"]
@@ -270,7 +286,7 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
 
                 seqNum = '%03d' % counter
                 respHeader = obj.createResponseHeader("INUP", seqNum, '0')
-                response = respHeader+"200;OK"
+                response = respHeader#+"200;OK"
 
             else:
                 try:
@@ -278,16 +294,18 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
                 except Exception,e:
                     print "ignoring Duplicates"
                 respHeader = obj.createResponseHeader("INUP", "001", '0')
-                response = respHeader+"200;OK"
+                response = respHeader#+"200;OK"
 
         elif method == "EXIT":
             obj.removePeerDatabase()
             respHeader = obj.createResponseHeader("EXIT", '001', '0')
-            response = respHeader+"200;OK"
+            response = respHeader#+"200;OK"
             print response
 
         elif method == "QCON":
+            print "Query for content is being done"
             resp = obj.queryForContent()
+
             fragments = obj.fragmentContent(resp)
             globals()[bufferName+"_sendbases"] = range(len(fragments))
             globals()[bufferName+"_sbCopy"] = range(len(fragments))
@@ -296,18 +314,28 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
             clientAddr = self.client_address
             global skt
             skt = socket
-            print fragments
-            return
             obj.reliableTransfer(socket, self.client_address, fragments)
             # for fragment in fragments:
             #     print fragment
             #     socket.sendto(fragment, self.client_address)
             return
+
         elif method == "QRES":
             print "ACK FROM CLIENT:"+ data
             seq = int(obj.receivedMsg["SEQ"])
-            globals()[bufferName+"_sendbases"] = globals()[bufferName+"_sbCopy"][seq:]
+
+
+            # print "*** = "+str(seq)
+            # print globals()[bufferName+"_sendbases"]
+            # print globals()[bufferName+"_sbCopy"]
+            # print "******"
+
+            try:
+                globals()[bufferName+"_sendbases"] = globals()[bufferName+"_sbCopy"][seq:]
+            except:
+                print "ignoring duplicate Acks"
             return
+
         serverDelay = random.randint(1,11)/100.0
         time.sleep(serverDelay)
         socket.sendto(response, self.client_address)
@@ -332,7 +360,7 @@ def main():
     server.shutdown()
 
 if __name__ == "__main__":
-    print "hi"
+    print "Starting Light Share DIRECTORY Server .."
     main()
 
 

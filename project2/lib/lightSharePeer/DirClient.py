@@ -132,10 +132,12 @@ class DirClient:
         self.serverPort = port
         self.sock.connect((self.serverHost, self.serverPort))
 
+
         #params releated to the peer client/server
         self.peerPort = str(peerPort)
         self.hostname = socket.gethostname()
         self.IP = socket.gethostbyname(self.hostname)
+        self.address = self.IP+":"+self.peerPort
 
     def retransmitIfTimedOut(self):
         try:
@@ -173,6 +175,9 @@ class DirClient:
                 data = data+buf[key]
             except:
                 continue
+
+        print data
+        return
         data = yaml.load(data)
         print data
         return data
@@ -181,20 +186,28 @@ class DirClient:
 
         lastSyn = -1
         responseFiles = {}
-        while(1):
+        future = time.time()+ maxRetry
+        # ACK until Maxtimeout
+        status = {}
+
+        while(1 and time.time()<future):
             try:
                 received = self.sock.recv(messageLimit)
-                print "***"+received
+                print "Received Message = "+received
                 received = received.split(";")
 
-                seq = received[1]
-                flag = received[2]
+                seq = received[2]
+                flag = received[3]
                 if (seq == "000" and flag == "0"):
-                    files = received[3]
+                    files = received[6]
                     files = yaml.load(files)
+                    msgObj = createAppMesage(600)
+                    message = msgObj.createMessage("QRES", self.address, self.hostname,"",1)
+                    self.sock.send(message + "\n")
                     return files
+
                 else:
-                    responseFiles[seq] = received[3]
+                    responseFiles[seq] = received[6]
 
                 if (flag == '0' and seq!="000"):
                     lastSyn = int(seq)
@@ -202,22 +215,28 @@ class DirClient:
                 counter = self.getExpectedSeqNum(responseFiles)
                 ACK_SEQ = counter
                 msgObj = createAppMesage(600)
-                address = self.IP+":"+self.peerPort
-                message = msgObj.createMessage("QRES", address, self.hostname,"",ACK_SEQ)
+                message = msgObj.createMessage("QRES", self.address, self.hostname,"",ACK_SEQ)
                 self.sock.send(message + "\n")
+                status = received[4]
+                phrase = received[5]
 
                 if (counter == lastSyn+1):
                     break
             except:
                 msgObj = createAppMesage(600)
                 counter = self.getExpectedSeqNum(responseFiles)
-                address = self.IP+":"+self.peerPort
-                message = msgObj.createMessage("QRES", address, self.hostname,"",counter)
+                message = msgObj.createMessage("QRES", self.address, self.hostname,"",counter-1)
                 self.sock.send(message + "\n")
                 continue
 
+
+
+
         files =  self.reassembleData(responseFiles)
-        return files
+        return
+        # files["Status"] = status
+        # files["Phrase"] = phrase
+        # return files
 
     def reliableTransfer(self , messages, type = "default", shuffle = 0):
 
@@ -258,9 +277,9 @@ class DirClient:
                     receivedMsg = self.sock.recv(messageLimit)
                     print "Received msg= "+receivedMsg
                     data = receivedMsg.split(";")
-                    ackSeq = data[1]
-                    status["Status"] = data[3]
-                    status["Phrase"] = data[4]
+                    ackSeq = data[2]
+                    status["Status"] = data[4]
+                    status["Phrase"] = data[5]
                     sb = int(ackSeq)
                     sendBases = sbCopy[sb:]
 
@@ -307,11 +326,14 @@ def main():
 
     peerPort = getFreePort()[1]
     obj = DirClient(DirServerIp, DirServerPort, peerPort)
-    #obj.informAndUpdate(dirPath)
-    # # # time.sleep(10)
-    #obj.gracefulExit()
 
-    obj.queryForContent("zab")
+    obj.informAndUpdate(dirPath)
+    #
+    # print "inform and update done"
+    #time.sleep(3)
+    obj.queryForContent("")
+
+#    obj.gracefulExit()
 
     # hostname = socket.gethostname()
     # IP = socket.gethostbyname(hostname)

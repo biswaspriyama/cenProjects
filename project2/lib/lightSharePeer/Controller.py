@@ -9,7 +9,7 @@ from Config import *
 from httpClient import *
 from httpServer import *
 from threading import Thread
-from DirClient import *
+from DirClient import  *
 
 def getFreePort():
     s = socket.socket()
@@ -19,17 +19,27 @@ def getFreePort():
     return port
 
 def main():
-    
+
+    # peerPort = getFreePort()[1]
+    # obj = DirClient(DirServerIp, DirServerPort, peerPort)
+    # file = raw_input("Enter File name to search/Press Enter for Directory Listing:")
+    #
+    # obj.queryForContent(file)
+    # #
+
     peerPort = getFreePort()[1]
     obj = DirClient(DirServerIp, DirServerPort, peerPort)
     obj.informAndUpdate(dirPath)
+
     hostname = socket.gethostname()
     IP = socket.gethostbyname(hostname)
     httpd = ThreadedHTTPServer((IP, peerPort), Handler)
     threading.Thread(target=httpd.serve_forever).start()
 
-    i = raw_input("Enter File name to search/Press Enter for Directory Listing")
-    obj.queryForContent(i)
+    file = raw_input("Enter File name to search/Press Enter for Directory Listing:")
+
+    
+    obj.queryForContent(file)
 
     while True:
         i = raw_input("Enter y to download (or n to quit): ")
@@ -46,7 +56,7 @@ def main():
 
 
 
-    httpd.shutdown()
+    # httpd.shutdown()
 
 if __name__ == '__main__':
     main()
